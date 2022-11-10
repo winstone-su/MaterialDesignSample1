@@ -62,8 +62,10 @@ class MainActivity : ToolbarActivity<ActivityMainBinding>() {
         mAdapter.listener = object : MainAdapter.OnItemClickListener{
             override fun onItemClick(v: View, position: Int) {
                 when(position) {
+                    0 -> openActivity(SwipeRefreshLayoutActivity::class.java)
                     1 -> openActivity(FloatingActionButtonActivity::class.java)
                     2 -> openActivity(SnackbarActivity::class.java)
+                    3 -> openActivity(TabLayoutActivity::class.java)
                 }
             }
 

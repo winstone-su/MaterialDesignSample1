@@ -34,6 +34,7 @@ abstract class ToolbarActivity<VB: ViewBinding>: AppCompatActivity(){
         setContentView(binding.root)
         mToolbar = findViewById(R.id.toolbar)
         setToolBar()
+        setListener()
         initView(savedInstanceState)
     }
 
