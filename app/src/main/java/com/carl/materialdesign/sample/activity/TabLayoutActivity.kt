@@ -1,17 +1,26 @@
 package com.carl.materialdesign.sample.activity
 
 import android.graphics.Color
+import android.graphics.ColorFilter
 import android.graphics.Typeface
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
+import com.airbnb.lottie.LottieAnimationView
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.SimpleColorFilter
+import com.airbnb.lottie.model.KeyPath
+import com.airbnb.lottie.value.LottieValueCallback
 import com.carl.materialdesign.sample.R
 import com.carl.materialdesign.sample.databinding.ActivityTabLayoutBinding
+import com.carl.materialdesign.sample.databinding.ItemTabBinding
 import com.carl.materialdesign.sample.fragment.Fragment1
 import com.carl.materialdesign.sample.fragment.Fragment2
 import com.carl.materialdesign.sample.fragment.Fragment3
@@ -36,6 +45,8 @@ class TabLayoutActivity : ToolbarActivity<ActivityTabLayoutBinding>() {
         initTabLayout4()
         initTabLayout5()
         initTabLayout6()
+        initTabLayout7()
+        initTabLayout8()
     }
 
     private fun initTabLayout1() {
@@ -139,8 +150,52 @@ class TabLayoutActivity : ToolbarActivity<ActivityTabLayoutBinding>() {
      * 隐藏tab count红点提示function & tab宽度
      */
     private fun initTabLayout7() {
+        TabLayoutMediator(binding.tabLayout7,binding.viewPager2) { tab, position ->
+            tab.text = tabTitles[position]
+        }.attach()
 
     }
+
+    /**
+     * 自定义item view & lottie
+     */
+    private fun initTabLayout8() {
+        val animMap = mapOf("party" to R.raw.anim_confetti, "pizza" to R.raw.anim_pizza, "apple" to R.raw.anim_apple)
+
+        animMap.keys.forEach { s ->
+            val tab = binding.tabLayout8.newTab()
+            val view = ItemTabBinding.inflate(layoutInflater)
+            view.let {
+                it.lavTabImg.setAnimation(animMap[s]!!)
+                it.lavTabImg.setColorFilter(Color.BLUE)
+                it.tvTabText.text = s
+                tab.customView = it.root
+            }
+            binding.tabLayout8.addTab(tab)
+        }
+
+        val defaultTab = binding.tabLayout8.getTabAt(defaultIndex)
+        defaultTab?.select()
+        defaultTab?.setSelected()
+        binding.tabLayout8.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener{
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.run {
+                    setSelected()
+                    binding.viewPager2.currentItem = position
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                tab?.setUnselected()
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {
+            }
+
+        })
+
+    }
+
 
     private fun switchTextStyle(tab: TabLayout.Tab?) {
         tab?.let {
@@ -200,6 +255,56 @@ class TabLayoutActivity : ToolbarActivity<ActivityTabLayoutBinding>() {
             }
         }
 
+    }
+
+
+    /**
+     * 选中状态
+     */
+    fun TabLayout.Tab.setSelected() {
+        this.customView?.let {
+            val textView = it.findViewById<TextView>(R.id.tv_tab_text)
+            val selectedColor = ContextCompat.getColor(this@TabLayoutActivity, R.color.colorPrimary)
+            textView.setTextColor(selectedColor)
+
+            val imageView = it.findViewById<LottieAnimationView>(R.id.lav_tab_img)
+            if (!imageView.isAnimating) {
+                imageView.playAnimation()
+            }
+            setLottieColor(imageView, true)
+        }
+    }
+
+    /**
+     * 未选中状态
+     */
+    fun TabLayout.Tab.setUnselected() {
+        this.customView?.let {
+            val textView = it.findViewById<TextView>(R.id.tv_tab_text)
+            val unselectedColor = ContextCompat.getColor(this@TabLayoutActivity, R.color.black)
+            textView.setTextColor(unselectedColor)
+
+            val imageView = it.findViewById<LottieAnimationView>(R.id.lav_tab_img)
+            if (imageView.isAnimating) {
+                imageView.cancelAnimation()
+                imageView.progress = 0f // 还原初始状态
+            }
+            setLottieColor(imageView, false)
+        }
+    }
+
+    /**
+     * set lottie icon color
+     */
+    private fun setLottieColor(imageView: LottieAnimationView?, isSelected: Boolean) {
+        imageView?.let {
+            val color = if (isSelected) R.color.colorPrimary else R.color.black
+            val csl = AppCompatResources.getColorStateList(this@TabLayoutActivity, color)
+            val filter = SimpleColorFilter(csl.defaultColor)
+            val keyPath = KeyPath("**")
+            val callback = LottieValueCallback<ColorFilter>(filter)
+            it.addValueCallback(keyPath, LottieProperty.COLOR_FILTER, callback)
+        }
     }
 
 }

@@ -46,7 +46,7 @@ class MainActivity : ToolbarActivity<ActivityMainBinding>() {
             getString(R.string.divider)
         )
 
-        mAdapter = MainAdapter(this,dataList)
+        mAdapter = MainAdapter(this, dataList)
         binding.recycleView.run {
             adapter = mAdapter
         }
@@ -56,16 +56,19 @@ class MainActivity : ToolbarActivity<ActivityMainBinding>() {
         initFloatingButtonImage()
     }
 
-    override fun setToolBar(){}
+    override fun setToolBar() {}
 
     private fun setListener() {
-        mAdapter.listener = object : MainAdapter.OnItemClickListener{
+        mAdapter.listener = object : MainAdapter.OnItemClickListener {
             override fun onItemClick(v: View, position: Int) {
-                when(position) {
+                when (position) {
                     0 -> openActivity(SwipeRefreshLayoutActivity::class.java)
                     1 -> openActivity(FloatingActionButtonActivity::class.java)
                     2 -> openActivity(SnackbarActivity::class.java)
                     3 -> openActivity(TabLayoutActivity::class.java)
+                    4 -> openActivity(CardViewActivity::class.java)
+                    5 -> openActivity(BottomNavigationActivity::class.java)
+                    19 -> openActivity(DividerActivity::class.java)
                 }
             }
 
@@ -88,8 +91,8 @@ class MainActivity : ToolbarActivity<ActivityMainBinding>() {
     }
 
     /**
-    * 是否深色主题
-    */
+     * 是否深色主题
+     */
     private fun isDarkTheme(): Boolean {
         val flag = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return flag == Configuration.UI_MODE_NIGHT_YES
